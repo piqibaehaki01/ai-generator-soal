@@ -6,22 +6,32 @@ export default function Home() {
   const [mapel, setMapel] = useState("");
   const [jumlah, setJumlah] = useState("");
   const [hasil, setHasil] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const generateSoal = async () => {
-    const res = await fetch("/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        mapel,
-        jumlah,
-      }),
-    });
+    try {
+      setLoading(true);
 
-    const data = await res.json();
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          mapel,
+          jumlah,
+        }),
+      });
 
-    setHasil(data.soal);
+      const data = await res.json();
+
+      setHasil(data.soal);
+    } catch (error) {
+      console.log(error);
+      alert("Terjadi error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -37,7 +47,7 @@ export default function Home() {
       />
 
       <input
-        type="text"
+        type="number"
         placeholder="Jumlah Soal"
         value={jumlah}
         onChange={(e) => setJumlah(e.target.value)}
@@ -48,7 +58,7 @@ export default function Home() {
         onClick={generateSoal}
         className="bg-black text-white px-4 py-2 rounded"
       >
-        Generate
+        {loading ? "Loading..." : "Generate"}
       </button>
 
       <div className="mt-10 whitespace-pre-wrap">{hasil}</div>
